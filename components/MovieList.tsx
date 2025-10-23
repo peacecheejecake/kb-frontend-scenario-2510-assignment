@@ -68,9 +68,9 @@ export default function MovieList() {
         </p>
       )}
       <ul className="flex flex-wrap justify-center gap-5">
-        {movies?.map(movie => (
+        {movies?.map((movie, index) => (
           <MovieItem
-            key={`/movies/${movie.imdbID}`}
+            key={`/movies-${index}/${movie.imdbID}`}
             movie={movie}
           />
         ))}
