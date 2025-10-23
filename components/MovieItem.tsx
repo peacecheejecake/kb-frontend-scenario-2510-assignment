@@ -18,12 +18,18 @@ export default function MovieItem({ movie }: { movie: SimpleMovie }) {
       <Link
         prefetch
         href={`/movies/${movie.imdbID}`}>
-        <Image
-          src={movie.Poster}
-          alt={movie.Title}
-          width="200"
-          height="300"
-        />
+        {movie.Poster === 'N/A' ? (
+          <div className="flex h-[300px] w-[200px] items-center justify-center bg-[var(--color-area)] text-center text-sm text-[var(--color-primary)]">
+            No Image
+          </div>
+        ) : (
+          <Image
+            src={movie.Poster}
+            alt={movie.Title}
+            width="200"
+            height="300"
+          />
+        )}
         <div className="absolute bottom-0 left-0 box-border w-full bg-[rgba(14,17,27,.3)] p-[14px] text-center text-base backdrop-blur-[10px]">
           <p className="text-sm text-[var(--color-primary)]">{movie.Year}</p>
           <h3 className="font-bold text-[var(--color-white)]">{movie.Title}</h3>
