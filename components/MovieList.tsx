@@ -1,10 +1,64 @@
 'use client'
+import { useCallback, useEffect, useRef } from 'react'
 import { useMovies, useMoviesStore } from '@/hooks/movies'
 import MovieItem from '@/components/MovieItem'
 
 export default function MovieList() {
-  const message = useMoviesStore(state => state.message)
-  const { data: movies } = useMovies()
+  const {
+    data: movies,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage
+  } = useMovies()
+  const messageStore = useMoviesStore(state => state.message)
+  const message = isFetching ? 'Loading...' : messageStore
+
+  const ioElementRef = useRef<HTMLDivElement | null>(null)
+  const ioRef = useRef<IntersectionObserver | null>(null)
+
+  const handleIoElement = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (ioRef.current) {
+        ioRef.current.disconnect()
+        ioRef.current = null
+      }
+
+      if (!node || !hasNextPage) return
+
+      ioElementRef.current = node
+
+      ioRef.current = new IntersectionObserver(
+        entries => {
+          if (entries[0].isIntersecting) {
+            if (!isFetchingNextPage && hasNextPage) {
+              fetchNextPage()
+            }
+          }
+        },
+        {
+          root: null,
+          rootMargin: '300px',
+          threshold: 0.1
+        }
+      )
+
+      ioRef.current.observe(node)
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  )
+
+  useEffect(() => {
+    const lastMovieElement = document.querySelector('ul li:last-child')
+    if (lastMovieElement) {
+      ioElementRef.current = lastMovieElement as HTMLDivElement
+    }
+    return () => {
+      if (lastMovieElement) {
+        ioRef.current?.unobserve(lastMovieElement)
+      }
+    }
+  }, [movies])
 
   return (
     <div className="rounded bg-[var(--color-area)] p-5">
@@ -21,6 +75,8 @@ export default function MovieList() {
           />
         ))}
       </ul>
+
+      <div ref={handleIoElement} />
     </div>
   )
 }

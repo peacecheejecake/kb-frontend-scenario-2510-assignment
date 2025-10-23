@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { create } from 'zustand'
 import { combine } from 'zustand/middleware'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 export type Movies = SimpleMovie[]
 export interface SimpleMovie {
@@ -65,9 +65,60 @@ export const useMoviesStore = create(
   )
 )
 
+async function fetchMovies(
+  searchText: string,
+  page: number
+): Promise<{
+  movies: Movies
+  message?: string
+}> {
+  if (!searchText) {
+    return { movies: [], message: defaultMessage }
+  }
+
+  try {
+    const response = await axios.get(
+      `/api/movies?title=${searchText}&page=${page}`
+    )
+
+    if (response.data?.Response === 'True') {
+      return {
+        movies: response.data.Search as Movies
+        // message: `Found ${response.data.Search.length} results.`
+      }
+    } else if (response.data?.Response === 'False') {
+      return {
+        movies: [],
+        message: response.data.Error
+      }
+    } else {
+      return Promise.reject(new Error('Unknown error occurred.'))
+    }
+  } catch (error) {
+    return Promise.reject(
+      new Error(error instanceof Error ? error.message : 'Unknown error')
+    )
+  }
+}
+
 export function useMovies() {
   const searchText = useMoviesStore(state => state.searchText)
   const setMessage = useMoviesStore(state => state.setMessage)
-  // TODO: 데이터 패칭 및 캐싱 관리
-  return useQuery()
+
+  return useInfiniteQuery({
+    queryKey: ['data', { searchText }],
+    queryFn: async ({ pageParam }) => {
+      const { movies, message } = await fetchMovies(searchText, pageParam)
+      setMessage(message ?? '')
+      return movies
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage?.length > 0 ? allPages.length + 1 : undefined
+    },
+    initialPageParam: 1,
+    maxPages: 100,
+    select: data => data.pages.flat(),
+    staleTime: 1000 * 60 * 60, // 1 hour
+    retry: 1
+  })
 }
