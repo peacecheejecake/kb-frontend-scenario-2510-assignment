@@ -38,7 +38,7 @@ export default function MovieList() {
         },
         {
           root: null,
-          rootMargin: '300px',
+          rootMargin: '500px',
           threshold: 0.1
         }
       )
