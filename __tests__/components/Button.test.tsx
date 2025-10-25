@@ -38,7 +38,7 @@ describe('<Button>', () => {
       </Button>
     )
     const loader = screen.getByTestId('loader')
-    expect(loader).toHaveAttribute('borderColor', color)
+    expect(loader).toHaveStyle(`border-color: ${color}`)
   })
 
   test('loading 상태일 때 children이 숨겨진다', () => {

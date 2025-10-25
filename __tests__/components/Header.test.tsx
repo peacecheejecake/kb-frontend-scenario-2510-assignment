@@ -25,7 +25,7 @@ describe('<Header>', () => {
   // 헤더 기본 렌더링 확인
   test('헤더가 정상적으로 렌더링된다', () => {
     render(<Header />)
-    const header = screen.getByRole('header')
+    const header = screen.getByRole('banner')
     expect(header).toBeInTheDocument()
   })
 
@@ -39,6 +39,7 @@ describe('<Header>', () => {
 
   // 현재 경로에 따른 활성 메뉴 스타일 적용 확인
   test('현재 경로가 "/"일 때 Search 메뉴가 활성화된다', () => {
+    ;(usePathname as jest.Mock).mockReturnValue('/')
     render(<Header />)
 
     // li에 활성 클래스가 붙는지 확인

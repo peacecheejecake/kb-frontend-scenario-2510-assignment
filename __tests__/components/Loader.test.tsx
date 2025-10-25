@@ -27,11 +27,11 @@ describe('<Loader>', () => {
   })
 
   test('color props를 사용하지 않으면 기본 색상이 적용된다', () => {
-    // 기본 color는 'primary'이고 Loader.tsx에서 primary => '#FDC000'
+    const primary = '#FDC000'
     render(<Loader />)
     const loader = screen.getByTestId('loader')
     expect(loader).toBeInTheDocument()
-    expect(loader.style.borderColor).toBe('#FDC000')
+    expect(loader).toHaveStyle(`border-color: ${primary}`)
   })
 
   test('color props를 사용하면 해당 색상이 적용된다', () => {
@@ -39,7 +39,7 @@ describe('<Loader>', () => {
     render(<Loader color={custom} />)
     const loader = screen.getByTestId('loader')
     expect(loader).toBeInTheDocument()
-    expect(loader.style.borderColor).toBe(custom)
+    expect(loader).toHaveStyle(`border-color: ${custom}`)
   })
 
   test('loading props가 false일 때 렌더링되지 않는다', () => {
