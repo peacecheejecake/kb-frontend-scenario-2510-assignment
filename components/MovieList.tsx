@@ -48,18 +48,6 @@ export default function MovieList() {
     [fetchNextPage, hasNextPage, isFetchingNextPage]
   )
 
-  useEffect(() => {
-    const lastMovieElement = document.querySelector('ul li:last-child')
-    if (lastMovieElement) {
-      ioElementRef.current = lastMovieElement as HTMLDivElement
-    }
-    return () => {
-      if (lastMovieElement) {
-        ioRef.current?.unobserve(lastMovieElement)
-      }
-    }
-  }, [movies])
-
   return (
     <div className="rounded bg-[var(--color-area)] p-5">
       {!movies?.length && message && (
